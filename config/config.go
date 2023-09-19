@@ -20,26 +20,24 @@ type Config struct {
 var conf = Config{}
 
 func init() {
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	flag.StringVar(&conf.configPath, "config", "", "path to the config file")
 	flag.StringVar(&conf.configPath, "c", "", "path to the config file")
 	flag.StringVar(&conf.Instance, "instance", "", "piped instance")
 	flag.StringVar(&conf.Instance, "i", "", "piped instance")
 	flag.Parse()
 
-	os.OpenFile(conf.configPath+"cgy.json", os.O_RDONLY|os.O_CREATE, 0666)
+	if conf.configPath == "" {
+		os.OpenFile("cgy.json", os.O_RDONLY|os.O_CREATE, 0666)
+	} else {
+		os.OpenFile(conf.configPath, os.O_RDONLY|os.O_CREATE, 0666)
+	}
 
 	initViper(&conf)
 }
 
 func initViper(c *Config) {
 	c.viper = viper.New()
-	c.viper.SetConfigFile("cgy.json")
-	if c.configPath == "" {
-		c.viper.AddConfigPath(".")
-	} else {
-		c.viper.AddConfigPath(c.configPath)
-	}
+	c.viper.SetConfigFile(c.configPath)
 	var err = c.viper.ReadInConfig()
 	if err != nil {
 		log.Println(err)

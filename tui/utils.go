@@ -106,7 +106,7 @@ func selectedVideo(_ int, mainText string, secondaryText string, _ rune) {
 		var video = piped.GetVideo(configs.Instance, split[len(split)-1])
 		clearList(pagesMaps["quality"])
 		pagesMaps["quality"].(*tview.List).SetSelectedFunc(func(index int, mainText string, _ string, _ rune) {
-			if strings.Contains(mainText, "video Only") {
+			if strings.Contains(mainText, "video only") {
 				playStream(video.Title, findUrl(index, video),
 					video.AudioStreams[0].Url)
 			} else {
@@ -117,14 +117,14 @@ func selectedVideo(_ int, mainText string, secondaryText string, _ rune) {
 		for _, v := range video.VidoeStreams {
 			txt = fmt.Sprintf("%-12s %-10s", v.Type, v.Quality)
 			if v.VideoOnly == true {
-				txt += " video Only"
+				txt += " video only"
 			}
 			addToList(pagesMaps["quality"], txt, "", nil)
 		}
 		for _, v := range video.AudioStreams {
 			txt = fmt.Sprintf("%-12s %-10s", v.Type, v.Quality)
 			if v.VideoOnly == true {
-				txt += " video Only"
+				txt += " video only"
 			}
 			addToList(pagesMaps["quality"], txt, "", nil)
 		}

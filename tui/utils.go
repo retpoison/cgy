@@ -148,8 +148,11 @@ func getArgs(title, url, audioUrl string) []string {
 
 	var args = strings.Split(options, " ")
 	for i, v := range args {
-		args[i] = strings.Replace(v, "%title%", title, 1)
-		args[i] = strings.Replace(v, "%audio%", audioUrl, 1)
+		if strings.Contains(v, "%title%") {
+			args[i] = strings.Replace(v, "%title%", title, 1)
+		} else if strings.Contains(v, "%audio%") {
+			args[i] = strings.Replace(v, "%audio%", audioUrl, 1)
+		}
 	}
 
 	args = append(args, url)

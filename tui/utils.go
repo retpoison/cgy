@@ -107,10 +107,10 @@ func selectedVideo(_ int, mainText string, secondaryText string, _ rune) {
 		clearList(pagesMaps["quality"])
 		pagesMaps["quality"].(*tview.List).SetSelectedFunc(func(index int, mainText string, _ string, _ rune) {
 			if strings.Contains(mainText, "video only") {
-				playStream(video.Title, findUrl(index, video),
-					video.AudioStreams[0].Url)
+				playStream(getArgs(video.Title, findUrl(index, video),
+					video.AudioStreams[0].Url))
 			} else {
-				playStream(video.Title, findUrl(index, video), "")
+				playStream(getArgs(video.Title, findUrl(index, video), ""))
 			}
 		})
 		var txt string
@@ -132,7 +132,12 @@ func selectedVideo(_ int, mainText string, secondaryText string, _ rune) {
 	}()
 }
 
-func playStream(title, url, audioUrl string) {
+func playStream(args []string) {
+	var command = exec.Command(configs.Program, args...)
+	command.Start()
+}
+
+func getArgs(title, url, audioUrl string) []string {
 	var options string
 	if audioUrl == "" {
 		options = strings.Replace(configs.Options,
@@ -148,9 +153,7 @@ func playStream(title, url, audioUrl string) {
 	}
 
 	args = append(args, url)
-
-	var command = exec.Command(configs.Program, args...)
-	command.Start()
+	return args
 }
 
 func findUrl(index int, v piped.Video) string {

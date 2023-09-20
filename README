@@ -37,3 +37,8 @@ Config path
 Piped Instance
     cgy -i https://pipedapi.kavin.rocks
 
+
+Some info
+---------
+If you choose "video only" videos, the program will automatically use one of the audiostreams to play the video with audio.
+in order to prevent that, you can delete "--audio-file=%audio%" from the config file.

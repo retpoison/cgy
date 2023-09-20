@@ -50,7 +50,7 @@ func initViper(c *Config) {
 		c.Set("options", "--force-window=yes --title=%title%")
 	}
 	if !(c.viper.IsSet("instance")) {
-		c.Set("options", "https://pipedapi.kavin.rocks")
+		c.Set("instance", "https://pipedapi.kavin.rocks")
 	}
 
 	var initConfig = func() {

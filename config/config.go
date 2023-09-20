@@ -27,10 +27,9 @@ func init() {
 	flag.Parse()
 
 	if conf.configPath == "" {
-		os.OpenFile("cgy.json", os.O_RDONLY|os.O_CREATE, 0666)
-	} else {
-		os.OpenFile(conf.configPath, os.O_RDONLY|os.O_CREATE, 0666)
+		conf.configPath = "cgy.json"
 	}
+	os.OpenFile(conf.configPath, os.O_RDONLY|os.O_CREATE, 0666)
 
 	initViper(&conf)
 }

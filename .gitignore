@@ -23,4 +23,7 @@ go.work
 # config file
 *.json
 
+# vim swap files
+*.swp
+
 cgy

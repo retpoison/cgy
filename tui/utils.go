@@ -105,8 +105,13 @@ func selectedVideo(_ int, mainText string, secondaryText string, _ rune) {
 		var split = strings.Split(secondaryText, " ")
 		var video = piped.GetVideo(configs.Instance, split[len(split)-1])
 		clearList(pagesMaps["quality"])
-		pagesMaps["quality"].(*tview.List).SetSelectedFunc(func(index int, _ string, _ string, _ rune) {
-			playStream(video.Title, findUrl(index, video))
+		pagesMaps["quality"].(*tview.List).SetSelectedFunc(func(index int, mainText string, _ string, _ rune) {
+			if strings.Contains(mainText, "video Only") {
+				playStream(video.Title, findUrl(index, video),
+					video.AudioStreams[0].Url)
+			} else {
+				playStream(video.Title, findUrl(index, video), "")
+			}
 		})
 		var txt string
 		for _, v := range video.VidoeStreams {
@@ -127,11 +132,21 @@ func selectedVideo(_ int, mainText string, secondaryText string, _ rune) {
 	}()
 }
 
-func playStream(title, url string) {
-	var args = strings.Split(configs.Options, " ")
+func playStream(title, url, audioUrl string) {
+	var options string
+	if audioUrl == "" {
+		options = strings.Replace(configs.Options,
+			"--audio-file=%audio%", "", 1)
+	} else {
+		options = configs.Options
+	}
+
+	var args = strings.Split(options, " ")
 	for i, v := range args {
 		args[i] = strings.Replace(v, "%title%", title, 1)
+		args[i] = strings.Replace(v, "%audio%", audioUrl, 1)
 	}
+
 	args = append(args, url)
 
 	var command = exec.Command(configs.Program, args...)

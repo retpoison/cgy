@@ -19,6 +19,7 @@ type Video struct {
 	Title            string    `json:"title"`
 	Id               string    `json:"url"`
 	Uploader         string    `json:"uploaderName"`
+	Uploaded         int       `json:"uploaded"`
 	UploadDate       string    `json:"uploadedDate"`
 	VidoeStreams     []streams `json:"videoStreams"`
 	AudioStreams     []streams `json:"audioStreams"`

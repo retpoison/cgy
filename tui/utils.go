@@ -20,16 +20,25 @@ func clearList(list tview.Primitive) {
 
 func refreshVideos() {
 	clearList(pagesMaps["video"])
+	addToList(pagesMaps["video"], "Getting Videos...", "", nil)
+	var videosSlice [][]piped.Video
+	var videosCount int = 0
+	var sortedChan = make(chan piped.Video, 3)
 
-	for _, ch := range configs.Channels {
-		var channel = piped.GetChannelVideos(configs.Instance, ch)
-		for _, v := range channel.Videos {
-			addToList(pagesMaps["video"], v.Title,
-				fmt.Sprintf("%s - %9s - %s - %s",
-					pding(channel.Name, 30), v.FormatedDuration, v.UploadDate, v.Id),
-				nil)
-		}
+	for i, ch := range configs.Channels {
+		videosSlice = append(videosSlice, piped.GetChannelVideos(configs.Instance, ch).Videos)
+		videosCount += len(videosSlice[i])
 	}
+
+	go sortVideos(sortedChan, videosSlice, videosCount)
+	clearList(pagesMaps["video"])
+	for v := range sortedChan {
+		addToList(pagesMaps["video"], v.Title,
+			fmt.Sprintf("%s - %9s - %s - %s",
+				pding(v.Uploader, 30), v.FormatedDuration, v.UploadDate, v.Id),
+			nil)
+	}
+
 	app.Draw()
 }
 
@@ -54,6 +63,35 @@ func updateInstances() {
 		addToList(pagesMaps["instance"], v, "", nil)
 	}
 	app.Draw()
+}
+
+func sortVideos(schan chan<- piped.Video, videos [][]piped.Video, count int) {
+	defer close(schan)
+	var index = make([]int, len(videos))
+	for i := range index {
+		index[i] = 0
+	}
+
+	for i := 0; i < count; i++ {
+		max := 0
+		for j := 0; j < len(videos); j++ {
+			if index[j] >= len(videos[j]) {
+				continue
+			}
+			if videos[j][index[j]].Uploaded > max {
+				max = videos[j][index[j]].Uploaded
+			}
+		}
+		for j := 0; j < len(videos); j++ {
+			if index[j] >= len(videos[j]) {
+				continue
+			}
+			if videos[j][index[j]].Uploaded == max {
+				schan <- videos[j][index[j]]
+				index[j]++
+			}
+		}
+	}
 }
 
 func selectedVideo(_ int, mainText string, secondaryText string, _ rune) {

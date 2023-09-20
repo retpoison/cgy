@@ -46,7 +46,7 @@ func initViper(c *Config) {
 		c.Set("program", "mpv")
 	}
 	if !(c.viper.IsSet("options")) {
-		c.Set("options", "--force-window=yes --title=%title%")
+		c.Set("options", `--force-window=yes --audio-file=%audio% --title=%title%`)
 	}
 	if !(c.viper.IsSet("instance")) {
 		c.Set("instance", "https://pipedapi.kavin.rocks")

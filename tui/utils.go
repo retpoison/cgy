@@ -94,16 +94,19 @@ func sortVideos(schan chan<- piped.Video, videos [][]piped.Video, count int) {
 	}
 }
 
-func selectedVideo(_ int, mainText string, secondaryText string, _ rune) {
+func selectedVideo(index int, mainText, secondaryText string, _ rune) {
+	qualities(mainText, getVideoId(index, secondaryText))
+}
+
+func qualities(title, id string) {
 	clearList(pagesMaps["quality"])
-	pagesMaps["quality"].(*tview.List).SetTitle(mainText)
+	pagesMaps["quality"].(*tview.List).SetTitle(title)
 	pages.SwitchToPage("quality")
 
 	addToList(pagesMaps["quality"], "Getting available qualities...", "", nil)
 
 	go func() {
-		var split = strings.Split(secondaryText, " ")
-		var video = piped.GetVideo(configs.Instance, split[len(split)-1])
+		var video = piped.GetVideo(configs.Instance, id)
 		clearList(pagesMaps["quality"])
 		pagesMaps["quality"].(*tview.List).SetSelectedFunc(func(index int, mainText string, _ string, _ rune) {
 			if strings.Contains(mainText, "video only") {
@@ -208,7 +211,7 @@ func getChannelId(str string) string {
 
 func getVideoId(status int, str string) string {
 	if status != -1 {
-		var split = strings.Split(secondaryText, " ")
+		var split = strings.Split(str, " ")
 		return split[len(split)-1]
 	} else {
 		return ""

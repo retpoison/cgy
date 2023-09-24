@@ -205,3 +205,12 @@ func getChannelId(str string) string {
 	var split = strings.Split(str, " ")
 	return split[len(split)-1]
 }
+
+func getVideoId(status int, str string) string {
+	if status != -1 {
+		var split = strings.Split(secondaryText, " ")
+		return split[len(split)-1]
+	} else {
+		return ""
+	}
+}

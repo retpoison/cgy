@@ -201,7 +201,7 @@ func center(p tview.Primitive, width, height int) tview.Primitive {
 		AddItem(nil, 0, 1, false)
 }
 
-func getId(str string) string {
+func getChannelId(str string) string {
 	var split = strings.Split(str, " ")
 	return split[len(split)-1]
 }

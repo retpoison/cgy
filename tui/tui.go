@@ -108,7 +108,7 @@ func getPage() *tview.Pages {
 		AddButtons([]string{"No", "Yes"}).
 		SetDoneFunc(func(_ int, buttonLabel string) {
 			if buttonLabel == "Yes" {
-				configs.RemoveChannel(getId(selectedChannel))
+				configs.RemoveChannel(getChannelId(selectedChannel))
 				go refreshChannels()
 				pages.SwitchToPage("channel")
 			} else if buttonLabel == "No" {

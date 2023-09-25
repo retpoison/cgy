@@ -112,7 +112,12 @@ func getPage() *tview.Pages {
 		SetFieldWidth(60)
 	playInput.SetDoneFunc(func(key tcell.Key) {
 		if key == tcell.KeyEnter {
-			qualities(getVideoId(-1, playInput.GetText()))
+			var id, err = getVideoId(-1, playInput.GetText())
+			if err != nil {
+				pages.SwitchToPage("video")
+			} else {
+				qualities(id)
+			}
 		} else {
 			pages.SwitchToPage("video")
 		}

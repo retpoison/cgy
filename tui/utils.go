@@ -184,6 +184,7 @@ func getHelpText() string {
 V, v    Videos
 C, c    Channels
 A, a    Add channel
+P, p    Play given video
 R, r    Refresh videos
 I, i    Instances
 H, h    help
@@ -191,7 +192,7 @@ Q, q    Quit
 Esc     Back
 
 Press Enter on video for playing
-Press Enter on channel fo deleting`
+Press Enter on channel for deleting`
 }
 
 func center(p tview.Primitive, width, height int) tview.Primitive {

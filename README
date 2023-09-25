@@ -23,6 +23,7 @@ Keybindings
 | V, v |----------Videos|
 | C, c |--------Channels|
 | A, a |-----Add channel|
+| P, p |Play given video|
 | R, r |--Refresh videos|
 | I, i |-------Instances|
 | H, h |------------help|
@@ -40,5 +41,4 @@ Piped Instance
 
 Some info
 ---------
-If you choose "video only" videos, the program will automatically use one of the audiostreams to play the video with audio.
-in order to prevent that, you can delete "--audio-file=%audio%" from the config file.
+If you choose "video only" videos, the program will automatically use one of the audiostreams to play the video with audio. In order to prevent that, you can delete "--audio-file=%audio%" from the config file.

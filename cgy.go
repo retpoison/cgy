@@ -1,8 +1,8 @@
 package main
 
 import (
-	"cgy/config"
-	"cgy/tui"
+	"github/retpoison/cgy/config"
+	"github/retpoison/cgy/tui"
 )
 
 func main() {

@@ -1,11 +1,12 @@
 package tui
 
 import (
-	"cgy/piped"
 	"fmt"
 	"os/exec"
 	"strings"
 	"unicode/utf8"
+
+	"github/retpoison/cgy/piped"
 
 	"github.com/rivo/tview"
 )

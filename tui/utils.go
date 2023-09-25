@@ -96,7 +96,12 @@ func sortVideos(schan chan<- piped.Video, videos [][]piped.Video, count int) {
 }
 
 func selectedVideo(index int, _, secondaryText string, _ rune) {
-	qualities(getVideoId(index, secondaryText))
+	var id, err = getVideoId(index, secondaryText)
+	if err != nil {
+		pages.SwitchToPage("video")
+	} else {
+		qualities(id)
+	}
 }
 
 func qualities(id string) {
@@ -211,24 +216,36 @@ func getChannelId(str string) string {
 	return split[len(split)-1]
 }
 
-func getVideoId(status int, str string) string {
+func getVideoId(status int, str string) (id string, err error) {
+	id = ""
+	err = nil
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("%v", r)
+		}
+	}()
+
 	if status != -1 {
 		var split = strings.Split(str, " ")
-		return split[len(split)-1]
+		id = split[len(split)-1]
 	}
 
 	// YouTube ID is a string of 11 characters.
-	var id string
 	if len(str) == 11 {
-		return str
+		id = str
 	} else if strings.Contains(str, "v=") {
 		var index = strings.Index(str, "v=")
-		return str[index+2 : index+13]
+		id = str[index+2 : index+13]
 	} else if len(str) > 11 {
 		var split = strings.Split(str, "/")
-		fmt.Println(split[len(split)-1])
+		id = split[len(split)-1]
 	}
 
-	return id
-
+	if strings.Contains(id, "&") ||
+		strings.Contains(id, "/") ||
+		len(id) < 11 {
+		id = ""
+		err = fmt.Errorf("Short or wrong video id")
+	}
+	return
 }

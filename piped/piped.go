@@ -38,7 +38,7 @@ func GetChannelVideos(instance, channelId string) Channel {
 	var channel = Channel{}
 	var err = request(instance+"/channel/"+channelId, &channel)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 
 	for i, v := range channel.Videos {

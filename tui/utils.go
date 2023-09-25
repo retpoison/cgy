@@ -213,7 +213,20 @@ func getVideoId(status int, str string) string {
 	if status != -1 {
 		var split = strings.Split(str, " ")
 		return split[len(split)-1]
-	} else {
-		return ""
 	}
+
+	// YouTube ID is a string of 11 characters.
+	var id string
+	if len(str) == 11 {
+		return str
+	} else if strings.Contains(str, "v=") {
+		var index = strings.Index(str, "v=")
+		return str[index+2 : index+13]
+	} else if len(str) > 11 {
+		var split = strings.Split(str, "/")
+		fmt.Println(split[len(split)-1])
+	}
+
+	return id
+
 }

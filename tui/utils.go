@@ -6,7 +6,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github/retpoison/cgy/piped"
+	"cgy/piped"
 
 	"github.com/rivo/tview"
 )

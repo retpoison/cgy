@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github/retpoison/cgy/config"
+	"cgy/config"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"

@@ -28,7 +28,7 @@ func init() {
 
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		pageName, _ := pages.GetFrontPage()
-		if pageName == "addChannel" {
+		if pageName == "addChannel" || pageName == "play" {
 			return event
 		}
 
@@ -39,6 +39,9 @@ func init() {
 			pages.SwitchToPage("channel")
 		case 'A', 'a':
 			pages.SwitchToPage("addChannel")
+			return nil
+		case 'P', 'p':
+			pages.SwitchToPage("play")
 			return nil
 		case 'R', 'r':
 			go refresh()
@@ -104,6 +107,20 @@ func getPage() *tview.Pages {
 	channelInput.SetBorder(true).
 		SetTitle(" Add channel ")
 
+	var playInput = tview.NewInputField().
+		SetLabel("Enter video Id or url: ").
+		SetFieldWidth(60)
+	playInput.SetDoneFunc(func(key tcell.Key) {
+		if key == tcell.KeyEnter {
+			qualities(getVideoId(-1, playInput.GetText()))
+		} else {
+			pages.SwitchToPage("video")
+		}
+		playInput.SetText("")
+	})
+	playInput.SetBorder(true).
+		SetTitle(" Play ")
+
 	var deleteButton = tview.NewModal().
 		AddButtons([]string{"No", "Yes"}).
 		SetDoneFunc(func(_ int, buttonLabel string) {
@@ -139,6 +156,7 @@ func getPage() *tview.Pages {
 	pagesMaps["channel"] = channelList
 	pagesMaps["help"] = helpText
 	pagesMaps["addChannel"] = channelInput
+	pagesMaps["play"] = playInput
 	pagesMaps["delete"] = deleteButton
 	pagesMaps["quality"] = qualityList
 	pagesMaps["instance"] = instanceList
@@ -148,6 +166,7 @@ func getPage() *tview.Pages {
 		AddPage("channel", pagesMaps["channel"], true, false).
 		AddPage("help", center(pagesMaps["help"], 30, 20), true, false).
 		AddPage("addChannel", center(pagesMaps["addChannel"], 60, 3), true, false).
+		AddPage("play", center(pagesMaps["play"], 85, 3), true, false).
 		AddPage("delete", center(pagesMaps["delete"], 60, 3), true, false).
 		AddPage("quality", pagesMaps["quality"], true, false).
 		AddPage("instance", pagesMaps["instance"], true, false)

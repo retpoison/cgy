@@ -228,6 +228,7 @@ func getVideoId(status int, str string) (id string, err error) {
 	if status != -1 {
 		var split = strings.Split(str, " ")
 		id = split[len(split)-1]
+		return
 	}
 
 	// YouTube ID is a string of 11 characters.

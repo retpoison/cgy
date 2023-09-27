@@ -35,11 +35,12 @@ type streams struct {
 }
 
 func GetChannelVideos(instance, channelId string) Channel {
-	var channel = Channel{}
-	var err = request(instance+"/channel/"+channelId, &channel)
+	var str, err = request(instance + "/channel/" + channelId)
 	if err != nil {
 		log.Println(err)
 	}
+	var channel = Channel{}
+	getStruct(str, &channel)
 
 	for i, v := range channel.Videos {
 		channel.Videos[i].Id = strings.Split(v.Id, "v=")[1]
@@ -52,12 +53,12 @@ func GetVideo(instance, videoId string) Video {
 	var url string = fmt.Sprintf("%s/streams/%s",
 		instance, url.QueryEscape(videoId))
 
-	var video = Video{}
-	var err = request(url, &video)
+	var str, err = request(url)
 	if err != nil {
 		log.Println(err)
 	}
-
+	var video = Video{}
+	getStruct(str, &video)
 	video.FormatedDuration = getDuration(video.Duration)
 
 	return video
@@ -66,14 +67,7 @@ func GetVideo(instance, videoId string) Video {
 func GetInstances() []string {
 	var instances []string
 	var url string = "https://raw.githubusercontent.com/wiki/TeamPiped/Piped-Frontend/Instances.md"
-
-	resp, err := http.Get(url)
-	if err != nil {
-		log.Println(err)
-	}
-	defer resp.Body.Close()
-
-	content, err := io.ReadAll(resp.Body)
+	var content, err = request(url)
 	if err != nil {
 		log.Println(err)
 	}
@@ -98,17 +92,26 @@ func getDuration(duration int) string {
 		duration/60/60, duration/60%60, duration%60)
 }
 
-func request(url string, v interface{}) error {
+func request(url string) (string, error) {
 	var resp, err = http.Get(url)
 	if err != nil {
-		return fmt.Errorf("request: %w", err)
+		return "", fmt.Errorf("request: %w", err)
 	}
 	defer resp.Body.Close()
 
-	err = json.NewDecoder(resp.Body).Decode(&v)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("request: %w", err)
+		return "", fmt.Errorf("request: %w", err)
 	}
+	var str = string(b)
 
+	return str, nil
+}
+
+func getStruct(str string, v interface{}) error {
+	var err = json.Unmarshal([]byte(str), &v)
+	if err != nil {
+		return fmt.Errorf("getStruct: %w", err)
+	}
 	return nil
 }

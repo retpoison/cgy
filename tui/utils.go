@@ -47,8 +47,9 @@ func refreshVideos() {
 func refreshChannels() {
 	clearList(pagesMaps["channel"])
 
+	var channel piped.Channel
 	for _, ch := range configs.Channels {
-		var channel = piped.GetChannelVideos(configs.Instance, ch)
+		channel = piped.GetChannelVideos(configs.Instance, ch)
 
 		addToList(pagesMaps["channel"],
 			fmt.Sprintf("%-20s %s", channel.Name, ch), "", nil)

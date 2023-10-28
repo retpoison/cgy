@@ -10,6 +10,7 @@ mpv and go.
 
 Installation
 ------------
+run
     git clone https://github.com/retpoison/cgy.git
     cd cgy
     go build
@@ -18,17 +19,19 @@ Installation
 
 Keybindings
 -----------
-| Key  |    Description |
-|:-----|---------------:|
-| V, v |----------Videos|
-| C, c |--------Channels|
-| A, a |-----Add channel|
-| P, p |Play given video|
-| R, r |--Refresh videos|
-| I, i |-------Instances|
-| H, h |------------help|
-| Q, q |------------Quit|
-| Esc  |------------Back|
+  j  |-------------Down
+  k  |---------------Up
+  g  |Beginning of list
+  G  |------End of list
+V, v |-----------Videos
+C, c |---------Channels
+A, a |------Add channel
+P, p |-Play given video
+R, r |---Refresh videos
+I, i |--------Instances
+H, h |-------------help
+Q, q |-------------Quit
+Esc  |-------------Back
 
 Flags
 -----

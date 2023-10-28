@@ -209,6 +209,20 @@ Select in instance list
 Select in quality list`
 }
 
+func helpTextWidth() int {
+	var max int = 0
+	for _, v := range strings.Split(getHelpText(), "\n") {
+		if len(v) > max {
+			max = len(v)
+		}
+	}
+	return max + 3
+}
+
+func helpTextHeight() int {
+	return len(strings.Split(getHelpText(), "\n")) + 3
+}
+
 func center(p tview.Primitive, width, height int) tview.Primitive {
 	return tview.NewFlex().
 		AddItem(nil, 0, 1, false).

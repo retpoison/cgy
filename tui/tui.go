@@ -178,7 +178,7 @@ func getPage() *tview.Pages {
 	var pages = tview.NewPages().
 		AddPage("video", pagesMaps["video"], true, true).
 		AddPage("channel", pagesMaps["channel"], true, false).
-		AddPage("help", center(pagesMaps["help"], 30, 20), true, false).
+		AddPage("help", center(pagesMaps["help"], helpTextWidth(), helpTextHeight()), true, false).
 		AddPage("addChannel", center(pagesMaps["addChannel"], 60, 3), true, false).
 		AddPage("play", center(pagesMaps["play"], 85, 3), true, false).
 		AddPage("delete", center(pagesMaps["delete"], 60, 3), true, false).

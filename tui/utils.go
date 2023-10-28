@@ -188,18 +188,25 @@ func pding(str string, length int) string {
 
 func getHelpText() string {
 	return `Keyboard shortcuts:
-V, v    Videos
-C, c    Channels
-A, a    Add channel
-P, p    Play given video
-R, r    Refresh videos
-I, i    Instances
-H, h    help
-Q, q    Quit
-Esc     Back
+  j  |-------------Down
+  k  |---------------Up
+  g  |Beginning of list
+  G  |------End of list
+V, v |-----------Videos
+C, c |---------Channels
+A, a |------Add channel
+P, p |-Play given video
+R, r |---Refresh videos
+I, i |--------Instances
+H, h |-------------help
+Q, q |-------------Quit
+Esc  |-------------Back
 
-Press Enter on video for playing
-Press Enter on channel for deleting`
+Enter, Space:
+Play in video list
+Delete in channel list
+Select in instance list
+Select in quality list`
 }
 
 func center(p tview.Primitive, width, height int) tview.Primitive {

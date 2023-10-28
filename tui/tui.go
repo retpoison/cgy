@@ -72,7 +72,9 @@ func Run(conf *config.Config) {
 func getPage() *tview.Pages {
 	var videoList = tview.NewList().
 		SetSelectedFunc(selectedVideo)
-	videoList.SetBorder(true).SetTitle(" Videos ═══ press h for help ")
+	videoList.SetBorder(true).
+		SetTitle(" Videos ═══ press h for help ").
+		SetInputCapture(vimShortcuts)
 
 	var selectedChannel string
 	var channelList = tview.NewList().
@@ -83,7 +85,9 @@ func getPage() *tview.Pages {
 				fmt.Sprintf("Do you want to remove\n%s ?", selectedChannel))
 			pages.SwitchToPage("delete")
 		})
-	channelList.SetBorder(true).SetTitle(" Channels ═══ press h for help ")
+	channelList.SetBorder(true).
+		SetTitle(" Channels ═══ press h for help ").
+		SetInputCapture(vimShortcuts)
 
 	var helpText = tview.NewTextView().
 		SetRegions(true).
@@ -144,7 +148,9 @@ func getPage() *tview.Pages {
 		SetDoneFunc(func() {
 			pages.SwitchToPage("video")
 		})
-	qualityList.SetBorder(true).SetTitle(" Choose quality ")
+	qualityList.SetBorder(true).
+		SetTitle(" Choose quality ").
+		SetInputCapture(vimShortcuts)
 
 	var instanceList = tview.NewList().
 		ShowSecondaryText(false).
@@ -155,7 +161,9 @@ func getPage() *tview.Pages {
 		SetDoneFunc(func() {
 			pages.SwitchToPage("video")
 		})
-	instanceList.SetBorder(true).SetTitle(" Instances ")
+	instanceList.SetBorder(true).
+		SetTitle(" Instances ").
+		SetInputCapture(vimShortcuts)
 
 	pagesMaps = map[string]tview.Primitive{}
 	pagesMaps["video"] = videoList

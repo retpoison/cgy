@@ -8,6 +8,7 @@ import (
 
 	"cgy/piped"
 
+	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
@@ -249,4 +250,18 @@ func getVideoId(status int, str string) (id string, err error) {
 		err = fmt.Errorf("Short or wrong video id")
 	}
 	return
+}
+
+func vimShortcuts(e *tcell.EventKey) *tcell.EventKey {
+	switch e.Rune() {
+	case 'j':
+		return tcell.NewEventKey(tcell.KeyDown, 0, tcell.ModNone)
+	case 'k':
+		return tcell.NewEventKey(tcell.KeyUp, 0, tcell.ModNone)
+	case 'g':
+		return tcell.NewEventKey(tcell.KeyHome, 0, tcell.ModNone)
+	case 'G':
+		return tcell.NewEventKey(tcell.KeyEnd, 0, tcell.ModNone)
+	}
+	return e
 }

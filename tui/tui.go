@@ -22,11 +22,6 @@ func init() {
 	app = tview.NewApplication()
 	app.SetRoot(pages, true)
 
-	var refresh = func() {
-		refreshVideos()
-		refreshChannels()
-	}
-
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		pageName, _ := pages.GetFrontPage()
 		if pageName == "addChannel" || pageName == "play" {
@@ -45,7 +40,7 @@ func init() {
 			pages.SwitchToPage("play")
 			return nil
 		case 'R', 'r':
-			go refresh()
+			go refreshVideos()
 		case 'I', 'i':
 			pages.SwitchToPage("instance")
 			go updateInstances()
@@ -58,7 +53,7 @@ func init() {
 		return event
 	})
 
-	go refresh()
+	go refreshVideos()
 }
 
 func Run(conf *config.Config) {

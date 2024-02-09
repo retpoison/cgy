@@ -209,7 +209,7 @@ V, v |-----------Videos
 C, c |---------Channels
 A, a |------Add channel
 P, p |-Play given video
-R, r |---Refresh videos
+R, r |----------Refresh
 I, i |--------Instances
 H, h |-------------help
 Q, q |-------------Quit

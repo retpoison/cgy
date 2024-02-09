@@ -21,15 +21,23 @@ func clearList(list tview.Primitive) {
 }
 
 func refreshVideos() {
+	channels := refreshChannels()
 	clearList(pagesMaps["video"])
-	addToList(pagesMaps["video"], "Getting Videos...", "", nil)
+
 	var videosSlice [][]piped.Video
 	var videosCount int = 0
 	var sortedChan = make(chan piped.Video, 3)
 
-	for i, ch := range configs.Channels {
-		videosSlice = append(videosSlice, piped.GetChannelVideos(configs.Instance, ch).Videos)
-		videosCount += len(videosSlice[i])
+	for chName, chID := range channels {
+
+		addToList(pagesMaps["video"],
+			fmt.Sprintf("Getting %s Videos...", chName), "", nil)
+
+		videosSlice = append(videosSlice, piped.GetChannelVideos(configs.Instance, chID).Videos)
+		videosCount += len(videosSlice[len(videosSlice)-1])
+
+		addToList(pagesMaps["video"], "Done.", "", nil)
+		app.Draw()
 	}
 
 	go sortVideos(sortedChan, videosSlice, videosCount)
@@ -44,17 +52,21 @@ func refreshVideos() {
 	app.Draw()
 }
 
-func refreshChannels() {
+func refreshChannels() map[string]string {
 	clearList(pagesMaps["channel"])
 
+	var channels = map[string]string{}
 	var channel piped.Channel
 	for _, ch := range configs.Channels {
 		channel = piped.GetChannelVideos(configs.Instance, ch)
+		channels[channel.Name] = ch
 
 		addToList(pagesMaps["channel"],
 			fmt.Sprintf("%-20s %s", channel.Name, ch), "", nil)
 	}
 	app.Draw()
+
+	return channels
 }
 
 func updateInstances() {

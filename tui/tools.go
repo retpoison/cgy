@@ -110,6 +110,9 @@ func sortVideos(schan chan<- piped.Video, videos [][]piped.Video, count int) {
 }
 
 func selectedVideo(index int, _, secondaryText string, _ rune) {
+	if secondaryText == "" {
+		return
+	}
 	var id, err = getVideoId(index, secondaryText)
 	if err != nil {
 		pages.SwitchToPage("video")

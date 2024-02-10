@@ -52,8 +52,6 @@ func init() {
 
 		return event
 	})
-
-	go refreshVideos()
 }
 
 func Run(conf *config.Config) {
@@ -66,7 +64,8 @@ func Run(conf *config.Config) {
 
 func getPage() *tview.Pages {
 	var videoList = tview.NewList().
-		SetSelectedFunc(selectedVideo)
+		SetSelectedFunc(selectedVideo).
+		AddItem("press R,r to refresh.", "", 0, nil)
 	videoList.SetBorder(true).
 		SetTitle(" Videos ═══ press h for help ").
 		SetInputCapture(vimShortcuts)
@@ -79,7 +78,8 @@ func getPage() *tview.Pages {
 			pagesMaps["delete"].(*tview.Modal).SetText(
 				fmt.Sprintf("Do you want to remove\n%s ?", selectedChannel))
 			pages.SwitchToPage("delete")
-		})
+		}).
+		AddItem("press R,r to refresh.", "", 0, nil)
 	channelList.SetBorder(true).
 		SetTitle(" Channels ═══ press h for help ").
 		SetInputCapture(vimShortcuts)

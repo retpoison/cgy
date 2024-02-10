@@ -122,6 +122,7 @@ func selectedVideo(index int, _, secondaryText string, _ rune) {
 }
 
 func qualities(id string) {
+	pagesMaps["quality"].(*tview.List).SetTitle(" Choose quality ")
 	clearList(pagesMaps["quality"])
 	pages.SwitchToPage("quality")
 

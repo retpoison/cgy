@@ -29,7 +29,6 @@ func refreshVideos() {
 	var sortedChan = make(chan piped.Video, 3)
 
 	for chName, chID := range channels {
-
 		addToList(pagesMaps["video"],
 			fmt.Sprintf("Getting %s Videos...", chName), "", nil)
 
@@ -70,6 +69,8 @@ func refreshChannels() map[string]string {
 }
 
 func updateInstances() {
+	pagesMaps["instance"].(*tview.List).
+		SetTitle(" Instances ═══" + configs.Instance + " ")
 	clearList(pagesMaps["instance"])
 	addToList(pagesMaps["instance"], "Getting instances...", "", nil)
 	var instances = piped.GetInstances()

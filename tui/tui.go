@@ -56,18 +56,18 @@ func init() {
 
 func Run(conf *config.Config) {
 	configs = conf
-
 	if err := app.Run(); err != nil {
 		log.Fatal(err)
 	}
 }
 
 func getPage() *tview.Pages {
+	var title = "══ h for help "
 	var videoList = tview.NewList().
 		SetSelectedFunc(selectedVideo).
 		AddItem("press R,r to refresh.", "", 0, nil)
 	videoList.SetBorder(true).
-		SetTitle(" Videos ═══ press h for help ").
+		SetTitle(" Videos " + title).
 		SetInputCapture(vimShortcuts)
 
 	var selectedChannel string
@@ -81,7 +81,7 @@ func getPage() *tview.Pages {
 		}).
 		AddItem("press R,r to refresh.", "", 0, nil)
 	channelList.SetBorder(true).
-		SetTitle(" Channels ═══ press h for help ").
+		SetTitle(" Channels " + title).
 		SetInputCapture(vimShortcuts)
 
 	var helpText = tview.NewTextView().

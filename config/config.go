@@ -1,82 +1,94 @@
 package config
 
 import (
+	"encoding/json"
 	"flag"
+	"fmt"
 	"log"
 	"os"
-
-	"github.com/spf13/viper"
+	"reflect"
 )
 
 type Config struct {
-	Instance   string
-	Channels   []string
-	Program    string
-	Options    string
+	Channels   []string `json:"channels"`
+	Instance   string   `json:"instance"`
+	Program    string   `json:"program"`
+	Options    string   `json:"options"`
+	LogFile    string   `json:"logFile"`
 	configPath string
-	viper      *viper.Viper
 }
 
 var conf = Config{}
 
 func init() {
-	flag.StringVar(&conf.configPath, "config", "", "path to the config file")
-	flag.StringVar(&conf.configPath, "c", "", "path to the config file")
-	flag.StringVar(&conf.Instance, "instance", "", "piped instance")
-	flag.StringVar(&conf.Instance, "i", "", "piped instance")
-	flag.Parse()
-
-	if conf.configPath == "" {
-		conf.configPath = "cgy.json"
-	}
+	setDefaults()
+	parseFlags()
 	os.OpenFile(conf.configPath, os.O_RDONLY|os.O_CREATE, 0666)
-
-	initViper(&conf)
+	readConfig()
 }
 
-func initViper(c *Config) {
-	c.viper = viper.New()
-	c.viper.SetConfigFile(c.configPath)
-	var err = c.viper.ReadInConfig()
+func setDefaults() {
+	conf.Channels = []string{}
+	conf.Instance = "https://pipedapi.kavin.rocks"
+	conf.Program = "mpv"
+	conf.Options = `--keep-open=yes --force-window=yes --audio-file=%audio% --title=%title%`
+	conf.LogFile = "cgy.log"
+	conf.configPath = "cgy.json"
+}
+
+func parseFlags() {
+	flag.StringVar(&conf.configPath, "config",
+		conf.configPath, "path to the config file")
+	flag.StringVar(&conf.configPath, "c",
+		conf.configPath, "path to the config file")
+	flag.StringVar(&conf.Instance, "instance",
+		conf.Instance, "piped instance")
+	flag.StringVar(&conf.Instance, "i",
+		conf.Instance, "piped instance")
+	flag.StringVar(&conf.LogFile, "log",
+		conf.LogFile, "path to the log file")
+	flag.StringVar(&conf.LogFile, "l",
+		conf.LogFile, "path to the log file")
+
+	flag.Parse()
+}
+
+func readConfig() {
+	content, err := os.ReadFile(conf.configPath)
 	if err != nil {
 		log.Println(err)
 	}
+	err = json.Unmarshal(content, &conf)
+	if err != nil {
+		log.Println(err)
+	}
+}
 
-	if !(c.viper.IsSet("program")) {
-		c.Set("program", "mpv")
+func save() {
+	content, err := json.MarshalIndent(conf, "", "  ")
+	if err != nil {
+		fmt.Println(err)
 	}
-	if !(c.viper.IsSet("options")) {
-		c.Set("options", `--keep-open=yes --force-window=yes --audio-file=%audio% --title=%title%`)
+	err = os.WriteFile(conf.configPath, content, 0644)
+	if err != nil {
+		log.Fatal(err)
 	}
-	if !(c.viper.IsSet("instance")) {
-		c.Set("instance", "https://pipedapi.kavin.rocks")
-	}
-
-	var initConfig = func() {
-		if c.Instance == "" {
-			c.Instance = c.viper.GetString("instance")
-		}
-		c.Channels = c.viper.GetStringSlice("channels")
-		c.Program = c.viper.GetString("program")
-		c.Options = c.viper.GetString("options")
-	}
-
-	initConfig()
 }
 
 func GetConfig() *Config {
 	return &conf
 }
 
-func (c *Config) Set(key, value string) {
-	c.viper.Set(key, value)
-	c.viper.WriteConfig()
+func (c *Config) Set(key string, value interface{}) {
+	rv := reflect.ValueOf(c).Elem()
+	fv := rv.FieldByName(key)
+	fv.Set(reflect.ValueOf(value))
+	save()
 }
 
 func (c *Config) AddChannel(channel string) {
 	c.Channels = append(c.Channels, channel)
-	c.viper.Set("channels", c.Channels)
-	c.viper.WriteConfig()
+	save()
 }
 
 func (c *Config) RemoveChannel(channel string) {
@@ -87,6 +99,5 @@ func (c *Config) RemoveChannel(channel string) {
 		}
 	}
 	c.Channels = chs
-	c.viper.Set("channels", c.Channels)
-	c.viper.WriteConfig()
+	save()
 }

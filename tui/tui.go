@@ -150,7 +150,7 @@ func getPage() *tview.Pages {
 	var instanceList = tview.NewList().
 		ShowSecondaryText(false).
 		SetSelectedFunc(func(_ int, mainText string, _ string, _ rune) {
-			configs.Set("instance", mainText)
+			configs.Set("Instance", mainText)
 			pages.SwitchToPage("video")
 		}).
 		SetDoneFunc(func() {

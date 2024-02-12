@@ -26,4 +26,7 @@ go.work
 # vim swap files
 *.swp
 
+# log file
+*.log
+
 cgy

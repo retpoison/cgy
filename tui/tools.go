@@ -70,15 +70,18 @@ func refreshChannels() map[string]string {
 
 func updateInstances() {
 	pagesMaps["instance"].(*tview.List).
-		SetTitle(" Instances ═══" + configs.Instance + " ")
+		SetTitle(" Instances ═══ " + configs.Instance + " ")
 	clearList(pagesMaps["instance"])
 	addToList(pagesMaps["instance"], "Getting instances...", "", nil)
 	var instances = piped.GetInstances()
 	clearList(pagesMaps["instance"])
-	for _, v := range instances {
-		addToList(pagesMaps["instance"], v, "", nil)
+
+	var ch = make(chan []string, 2)
+	go piped.RequestInstances(ch, instances)
+	for v := range ch {
+		addToList(pagesMaps["instance"], v[0], v[1], nil)
+		app.Draw()
 	}
-	app.Draw()
 }
 
 func sortVideos(schan chan<- piped.Video, videos [][]piped.Video, count int) {

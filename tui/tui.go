@@ -148,7 +148,6 @@ func getPage() *tview.Pages {
 		SetInputCapture(vimShortcuts)
 
 	var instanceList = tview.NewList().
-		ShowSecondaryText(false).
 		SetSelectedFunc(func(_ int, mainText string, _ string, _ rune) {
 			configs.Set("Instance", mainText)
 			pages.SwitchToPage("video")

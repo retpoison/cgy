@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync"
+	"time"
 )
 
 type Channel struct {
@@ -85,6 +87,48 @@ func GetInstances() []string {
 	}
 
 	return instances
+}
+
+func RequestInstances(ch chan []string, instance []string) {
+	var wg sync.WaitGroup
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
+	var last = [][]string{}
+
+	var req = func(in string) {
+		defer wg.Done()
+		var s []string
+		start := time.Now()
+		result, err := client.Get(in + "/streams/rRPQs_kM_nw")
+		if err == nil {
+			if result.StatusCode == 200 {
+				s = []string{
+					in,
+					fmt.Sprintf("%.2fs", time.Since(start).Seconds()),
+				}
+				result.Body.Close()
+				ch <- s
+			}
+		} else {
+			s = []string{
+				in,
+				">5s",
+			}
+			last = append(last, s)
+		}
+	}
+
+	for _, v := range instance {
+		go req(v)
+		wg.Add(1)
+	}
+
+	wg.Wait()
+	for _, v := range last {
+		ch <- v
+	}
+	close(ch)
 }
 
 func getDuration(duration int) string {

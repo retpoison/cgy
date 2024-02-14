@@ -1,4 +1,4 @@
-package tui
+package cgy
 
 import (
 	"fmt"
@@ -6,33 +6,23 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"cgy/piped"
-
-	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
-func addToList(list tview.Primitive, mainText, secondaryText string, selected func()) {
-	list.(*tview.List).AddItem(mainText, secondaryText, 0, selected)
-}
-
-func clearList(list tview.Primitive) {
-	list.(*tview.List).Clear()
-}
-
 func refreshVideos() {
-	channels := refreshChannels()
 	clearList(pagesMaps["video"])
+	addToList(pagesMaps["video"], "Refreshing...", "", nil)
+	channels := refreshChannels()
 
-	var videosSlice [][]piped.Video
+	var videosSlice [][]Video
 	var videosCount int = 0
-	var sortedChan = make(chan piped.Video, 3)
+	var sortedChan = make(chan Video, 3)
 
 	for chName, chID := range channels {
 		addToList(pagesMaps["video"],
 			fmt.Sprintf("Getting %s Videos...", chName), "", nil)
 
-		videosSlice = append(videosSlice, piped.GetChannelVideos(configs.Instance, chID).Videos)
+		videosSlice = append(videosSlice, getChannelVideos(config.Instance, chID).Videos)
 		videosCount += len(videosSlice[len(videosSlice)-1])
 
 		addToList(pagesMaps["video"], "Done.", "", nil)
@@ -55,9 +45,9 @@ func refreshChannels() map[string]string {
 	clearList(pagesMaps["channel"])
 
 	var channels = map[string]string{}
-	var channel piped.Channel
-	for _, ch := range configs.Channels {
-		channel = piped.GetChannelVideos(configs.Instance, ch)
+	var channel Channel
+	for _, ch := range config.Channels {
+		channel = getChannelVideos(config.Instance, ch)
 		channels[channel.Name] = ch
 
 		addToList(pagesMaps["channel"],
@@ -70,21 +60,21 @@ func refreshChannels() map[string]string {
 
 func updateInstances() {
 	pagesMaps["instance"].(*tview.List).
-		SetTitle(" Instances ═══ " + configs.Instance + " ")
+		SetTitle(" Instances ═══ " + config.Instance + " ")
 	clearList(pagesMaps["instance"])
 	addToList(pagesMaps["instance"], "Getting instances...", "", nil)
-	var instances = piped.GetInstances()
+	var instances = getInstances()
 	clearList(pagesMaps["instance"])
 
 	var ch = make(chan []string, 2)
-	go piped.RequestInstances(ch, instances)
+	go requestInstances(ch, instances)
 	for v := range ch {
 		addToList(pagesMaps["instance"], v[0], v[1], nil)
 		app.Draw()
 	}
 }
 
-func sortVideos(schan chan<- piped.Video, videos [][]piped.Video, count int) {
+func sortVideos(schan chan<- Video, videos [][]Video, count int) {
 	defer close(schan)
 	var index = make([]int, len(videos))
 	for i := range index {
@@ -113,27 +103,14 @@ func sortVideos(schan chan<- piped.Video, videos [][]piped.Video, count int) {
 	}
 }
 
-func selectedVideo(index int, _, secondaryText string, _ rune) {
-	if secondaryText == "" {
-		return
-	}
-	var id, err = getVideoId(index, secondaryText)
-	if err != nil {
-		pages.SwitchToPage("video")
-	} else {
-		qualities(id)
-	}
-}
-
 func qualities(id string) {
 	pagesMaps["quality"].(*tview.List).SetTitle(" Choose quality ")
 	clearList(pagesMaps["quality"])
 	pages.SwitchToPage("quality")
-
 	addToList(pagesMaps["quality"], "Getting available qualities...", "", nil)
 
 	go func() {
-		var video = piped.GetVideo(configs.Instance, id)
+		var video = getVideo(config.Instance, id)
 		clearList(pagesMaps["quality"])
 		pagesMaps["quality"].(*tview.List).SetTitle(" " + video.Title + " ")
 		pagesMaps["quality"].(*tview.List).SetSelectedFunc(func(index int, mainText string, _ string, _ rune) {
@@ -147,16 +124,13 @@ func qualities(id string) {
 		var txt string
 		for _, v := range video.VidoeStreams {
 			txt = fmt.Sprintf("%-12s %-10s", v.Type, v.Quality)
-			if v.VideoOnly == true {
+			if v.VideoOnly {
 				txt += " video only"
 			}
 			addToList(pagesMaps["quality"], txt, "", nil)
 		}
 		for _, v := range video.AudioStreams {
 			txt = fmt.Sprintf("%-12s %-10s", v.Type, v.Quality)
-			if v.VideoOnly == true {
-				txt += " video only"
-			}
 			addToList(pagesMaps["quality"], txt, "", nil)
 		}
 		app.Draw()
@@ -164,17 +138,17 @@ func qualities(id string) {
 }
 
 func playStream(args []string) {
-	var command = exec.Command(configs.Program, args...)
+	var command = exec.Command(config.Program, args...)
 	command.Start()
 }
 
 func getArgs(title, url, audioUrl string) []string {
 	var options string
 	if audioUrl == "" {
-		options = strings.Replace(configs.Options,
+		options = strings.Replace(config.Options,
 			"--audio-file=%audio%", "", 1)
 	} else {
-		options = configs.Options
+		options = config.Options
 	}
 
 	var args = strings.Split(options, " ")
@@ -190,7 +164,7 @@ func getArgs(title, url, audioUrl string) []string {
 	return args
 }
 
-func findUrl(index int, v piped.Video) string {
+func findUrl(index int, v Video) string {
 	if index <= len(v.VidoeStreams)-1 {
 		return v.VidoeStreams[index].Url
 	}
@@ -205,29 +179,6 @@ func pding(str string, length int) string {
 		str = str + strings.Repeat(" ", length-utf8.RuneCountInString(str))
 	}
 	return str
-}
-
-func getHelpText() string {
-	return `Keyboard shortcuts:
-  j  |-------------Down
-  k  |---------------Up
-  g  |Beginning of list
-  G  |------End of list
-V, v |-----------Videos
-C, c |---------Channels
-A, a |------Add channel
-P, p |-Play given video
-R, r |----------Refresh
-I, i |--------Instances
-H, h |-------------help
-Q, q |-------------Quit
-Esc  |-------------Back
-
-Enter, Space:
-Play in video list
-Delete in channel list
-Select in instance list
-Select in quality list`
 }
 
 func helpTextWidth() int {
@@ -294,16 +245,10 @@ func getVideoId(status int, str string) (id string, err error) {
 	return
 }
 
-func vimShortcuts(e *tcell.EventKey) *tcell.EventKey {
-	switch e.Rune() {
-	case 'j':
-		return tcell.NewEventKey(tcell.KeyDown, 0, tcell.ModNone)
-	case 'k':
-		return tcell.NewEventKey(tcell.KeyUp, 0, tcell.ModNone)
-	case 'g':
-		return tcell.NewEventKey(tcell.KeyHome, 0, tcell.ModNone)
-	case 'G':
-		return tcell.NewEventKey(tcell.KeyEnd, 0, tcell.ModNone)
-	}
-	return e
+func addToList(list tview.Primitive, mainText, secondaryText string, selected func()) {
+	list.(*tview.List).AddItem(mainText, secondaryText, 0, selected)
+}
+
+func clearList(list tview.Primitive) {
+	list.(*tview.List).Clear()
 }

@@ -116,9 +116,9 @@ func qualities(id string) {
 		pagesMaps["quality"].(*tview.List).SetSelectedFunc(func(index int, mainText string, _ string, _ rune) {
 			if strings.Contains(mainText, "video only") {
 				playStream(getArgs(video.Title, findUrl(index, video),
-					video.AudioStreams[0].Url))
+					video.AudioStreams[0].Url, video.Thumbnail))
 			} else {
-				playStream(getArgs(video.Title, findUrl(index, video), ""))
+				playStream(getArgs(video.Title, findUrl(index, video), "", video.Thumbnail))
 			}
 		})
 		var txt string
@@ -142,7 +142,7 @@ func playStream(args []string) {
 	command.Start()
 }
 
-func getArgs(title, url, audioUrl string) []string {
+func getArgs(title, url, audioUrl, thumbnail string) []string {
 	var options string
 	if audioUrl == "" {
 		options = strings.Replace(config.Options,
@@ -157,6 +157,8 @@ func getArgs(title, url, audioUrl string) []string {
 			args[i] = strings.Replace(v, "%title%", title, 1)
 		} else if strings.Contains(v, "%audio%") {
 			args[i] = strings.Replace(v, "%audio%", audioUrl, 1)
+		} else if strings.Contains(v, "%thumbnail%") {
+			args[i] = strings.Replace(v, "%thumbnail%", thumbnail, 1)
 		}
 	}
 

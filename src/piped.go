@@ -20,6 +20,7 @@ type Channel struct {
 type Video struct {
 	Title            string    `json:"title"`
 	Id               string    `json:"url"`
+	Thumbnail        string    `json:"thumbnailUrl"`
 	Uploader         string    `json:"uploaderName"`
 	Uploaded         int       `json:"uploaded"`
 	UploadDate       string    `json:"uploadedDate"`

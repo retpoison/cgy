@@ -24,7 +24,7 @@ func setDefaults() {
 	config.Channels = []string{}
 	config.Instance = "https://pipedapi.kavin.rocks"
 	config.Program = "mpv"
-	config.Options = `--keep-open=yes --force-window=yes --audio-file=%audio% --title=%title%`
+	config.Options = `--keep-open=yes --force-window=yes --audio-file=%audio% --title=%title% --external-file=%thumbnail% --vid=1`
 	config.LogFile = "cgy.log"
 	config.configPath = "cgy.json"
 }

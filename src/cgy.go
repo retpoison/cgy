@@ -1,20 +1,25 @@
-package main
+package cgy
 
 import (
-	"cgy/config"
-	"cgy/tui"
 	"log"
 	"os"
 )
 
-func main() {
-	var config *config.Config = config.GetConfig()
+func InitConfig() {
+	setDefaults()
+	parseFlags()
+	os.OpenFile(config.configPath, os.O_RDONLY|os.O_CREATE, 0666)
+	readConfig()
+}
+
+func SetLogOutput() {
 	f, err := os.OpenFile(config.LogFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		log.Fatalf("error opening file: %v", err)
 	}
-	defer f.Close()
 	log.SetOutput(f)
+}
 
-	tui.Run(config)
+func Run() {
+	run()
 }

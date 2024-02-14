@@ -1,4 +1,4 @@
-package piped
+package cgy
 
 import (
 	"encoding/json"
@@ -20,23 +20,24 @@ type Channel struct {
 type Video struct {
 	Title            string    `json:"title"`
 	Id               string    `json:"url"`
+	Thumbnail        string    `json:"thumbnailUrl"`
 	Uploader         string    `json:"uploaderName"`
 	Uploaded         int       `json:"uploaded"`
 	UploadDate       string    `json:"uploadedDate"`
-	VidoeStreams     []streams `json:"videoStreams"`
-	AudioStreams     []streams `json:"audioStreams"`
+	VidoeStreams     []Streams `json:"videoStreams"`
+	AudioStreams     []Streams `json:"audioStreams"`
 	Duration         int       `json:"duration"`
 	FormatedDuration string
 }
 
-type streams struct {
+type Streams struct {
 	Url       string `json:"url"`
 	Quality   string `json:"quality"`
 	Type      string `json:"mimeType"`
 	VideoOnly bool   `json:"videoOnly"`
 }
 
-func GetChannelVideos(instance, channelId string) Channel {
+func getChannelVideos(instance, channelId string) Channel {
 	var str, err = request(instance + "/channel/" + channelId)
 	if err != nil {
 		log.Println(err)
@@ -51,7 +52,7 @@ func GetChannelVideos(instance, channelId string) Channel {
 	return channel
 }
 
-func GetVideo(instance, videoId string) Video {
+func getVideo(instance, videoId string) Video {
 	var url string = fmt.Sprintf("%s/streams/%s",
 		instance, url.QueryEscape(videoId))
 
@@ -66,7 +67,7 @@ func GetVideo(instance, videoId string) Video {
 	return video
 }
 
-func GetInstances() []string {
+func getInstances() []string {
 	var instances []string
 	var url string = "https://raw.githubusercontent.com/wiki/TeamPiped/Piped-Frontend/Instances.md"
 	var content, err = request(url)
@@ -89,7 +90,7 @@ func GetInstances() []string {
 	return instances
 }
 
-func RequestInstances(ch chan []string, instance []string) {
+func requestInstances(ch chan []string, instance []string) {
 	var wg sync.WaitGroup
 	client := http.Client{
 		Timeout: 5 * time.Second,

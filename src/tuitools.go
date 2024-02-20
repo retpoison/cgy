@@ -50,8 +50,7 @@ func refreshChannels() map[string]string {
 		channel = getChannelVideos(config.Instance, ch)
 		channels[channel.Name] = ch
 
-		addToList(pagesMaps["channel"],
-			fmt.Sprintf("%-20s %s", channel.Name, ch), "", nil)
+		addToList(pagesMaps["channel"], channel.Name, ch, nil)
 	}
 	app.Draw()
 
@@ -205,11 +204,6 @@ func center(p tview.Primitive, width, height int) tview.Primitive {
 			AddItem(p, height, 1, true).
 			AddItem(nil, 0, 1, false), width, 1, true).
 		AddItem(nil, 0, 1, false)
-}
-
-func getChannelId(str string) string {
-	var split = strings.Split(str, " ")
-	return split[len(split)-1]
 }
 
 func getVideoId(status int, str string) (id string, err error) {

@@ -8,14 +8,14 @@ import (
 )
 
 func getPage() *tview.Pages {
-	var selectedChannel string
+	var selectedChannel, selectedChannelID string
 	pagesMaps = map[string]tview.Primitive{}
 	pagesMaps["video"] = getVideoList()
-	pagesMaps["channel"] = getChannelList(&selectedChannel)
+	pagesMaps["channel"] = getChannelList(&selectedChannel, &selectedChannelID)
 	pagesMaps["help"] = getHelpBox()
 	pagesMaps["addChannel"] = getChannelInput()
 	pagesMaps["play"] = getPlayInput()
-	pagesMaps["delete"] = getDeleteChannel(&selectedChannel)
+	pagesMaps["delete"] = getDeleteChannel(&selectedChannel, &selectedChannelID)
 	pagesMaps["quality"] = getQualityList()
 	pagesMaps["instance"] = getInstanceList()
 
@@ -53,18 +53,18 @@ func getVideoList() tview.Primitive {
 	return videoList
 }
 
-func getChannelList(sChannel *string) tview.Primitive {
+func getChannelList(sChannel, sChannelID *string) tview.Primitive {
 	var channelList = tview.NewList()
-	channelList.ShowSecondaryText(false).
-		AddItem("press R,r to refresh.", "", 0, nil).
+	channelList.AddItem("press R,r to refresh.", "", 0, nil).
 		SetBorder(true).
 		SetTitle(" Channels ══ h for help ").
 		SetInputCapture(vimShortcuts)
 
-	channelList.SetSelectedFunc(func(_ int, mainText string, _ string, _ rune) {
+	channelList.SetSelectedFunc(func(_ int, mainText string, secondaryText string, _ rune) {
 		*sChannel = mainText
+		*sChannelID = secondaryText
 		pagesMaps["delete"].(*tview.Modal).SetText(
-			fmt.Sprintf("Do you want to remove\n%s ?", *sChannel))
+			fmt.Sprintf("Do you want to remove %s?", *sChannel))
 		pages.SwitchToPage("delete")
 	})
 	return channelList
@@ -125,13 +125,13 @@ func getPlayInput() tview.Primitive {
 	return playInput
 }
 
-func getDeleteChannel(sChannel *string) tview.Primitive {
+func getDeleteChannel(sChannel, sChannelID *string) tview.Primitive {
 	var deleteChannel = tview.NewModal()
 	deleteChannel.AddButtons([]string{"No", "Yes"})
 
 	deleteChannel.SetDoneFunc(func(_ int, buttonLabel string) {
 		if buttonLabel == "Yes" {
-			config.removeChannel(getChannelId(*sChannel))
+			config.removeChannel(*sChannelID)
 			go refreshVideos()
 			pages.SwitchToPage("channel")
 		} else if buttonLabel == "No" {

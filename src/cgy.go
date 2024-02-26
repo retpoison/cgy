@@ -21,5 +21,6 @@ func SetLogOutput() {
 }
 
 func Run() {
+	defer log.Writer().(*os.File).Close()
 	run()
 }

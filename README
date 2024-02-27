@@ -41,7 +41,11 @@ Config path
 Piped Instance
     cgy -i https://pipedapi.kavin.rocks
 
+Log file
+    cgy -l /tmp/cgy.log
 
 Some info
 ---------
 If you choose "video only" videos, the program will automatically use one of the audiostreams to play the video with audio. In order to prevent that, you can delete "--audio-file=%audio%" from the config file.
+
+If you don't want to write logs into any file, set logFile to "None" in the config file or run the program with "-l None" flag.

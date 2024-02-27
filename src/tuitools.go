@@ -166,6 +166,7 @@ func qualities(id string) {
 
 func playStream(args []string) {
 	var command = exec.Command(config.Program, args...)
+	log.Println("running:", command.String())
 	command.Start()
 }
 

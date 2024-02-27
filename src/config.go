@@ -28,20 +28,21 @@ func setDefaults() {
 	config.configPath = "cgy.json"
 }
 
-func parseFlags() {
-	flag.StringVar(&config.configPath, "config",
-		config.configPath, "path to the config file")
-	flag.StringVar(&config.configPath, "c",
-		config.configPath, "path to the config file")
-	flag.StringVar(&config.Instance, "instance",
-		config.Instance, "piped instance")
-	flag.StringVar(&config.Instance, "i",
-		config.Instance, "piped instance")
-	flag.StringVar(&config.LogFile, "log",
-		config.LogFile, "path to the log file")
-	flag.StringVar(&config.LogFile, "l",
-		config.LogFile, "path to the log file")
-
+func parseFlags(s int) {
+	if s == 0 {
+		flag.StringVar(&config.configPath, "config",
+			config.configPath, "path to the config file")
+		flag.StringVar(&config.configPath, "c",
+			config.configPath, "path to the config file")
+		flag.StringVar(&config.Instance, "instance",
+			config.Instance, "piped instance")
+		flag.StringVar(&config.Instance, "i",
+			config.Instance, "piped instance")
+		flag.StringVar(&config.LogFile, "log",
+			config.LogFile, "path to the log file")
+		flag.StringVar(&config.LogFile, "l",
+			config.LogFile, "path to the log file")
+	}
 	flag.Parse()
 }
 

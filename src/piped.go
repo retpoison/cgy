@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -37,42 +36,47 @@ type Streams struct {
 	VideoOnly bool   `json:"videoOnly"`
 }
 
-func getChannelVideos(instance, channelId string) Channel {
+func getChannelVideos(instance, channelId string) (Channel, error) {
+	var channel = Channel{}
 	var str, err = request(instance + "/channel/" + channelId)
 	if err != nil {
-		log.Println(err)
+		return channel, fmt.Errorf("getChannelVideos: %w", err)
 	}
-	var channel = Channel{}
-	getStruct(str, &channel)
+	err = getStruct(str, &channel)
+	if err != nil {
+		return channel, fmt.Errorf("getChannelVideos: %w", err)
+	}
 
 	for i, v := range channel.Videos {
 		channel.Videos[i].Id = strings.Split(v.Id, "v=")[1]
 		channel.Videos[i].FormatedDuration = getDuration(v.Duration)
 	}
-	return channel
+	return channel, nil
 }
 
-func getVideo(instance, videoId string) Video {
+func getVideo(instance, videoId string) (Video, error) {
+	var video = Video{}
 	var url string = fmt.Sprintf("%s/streams/%s",
 		instance, url.QueryEscape(videoId))
-
 	var str, err = request(url)
 	if err != nil {
-		log.Println(err)
+		return video, fmt.Errorf("getVideo: %w", err)
 	}
-	var video = Video{}
-	getStruct(str, &video)
+	err = getStruct(str, &video)
+	if err != nil {
+		return video, fmt.Errorf("getVideo: %w", err)
+	}
 	video.FormatedDuration = getDuration(video.Duration)
 
-	return video
+	return video, nil
 }
 
-func getInstances() []string {
-	var instances []string
+func getInstances() ([]string, error) {
+	var instances = []string{}
 	var url string = "https://raw.githubusercontent.com/wiki/TeamPiped/Piped-Frontend/Instances.md"
 	var content, err = request(url)
 	if err != nil {
-		log.Println(err)
+		return instances, fmt.Errorf("getInstances: %w", err)
 	}
 
 	var skipped int = 0
@@ -87,7 +91,7 @@ func getInstances() []string {
 		}
 	}
 
-	return instances
+	return instances, nil
 }
 
 func requestInstances(ch chan []string, instance []string) {

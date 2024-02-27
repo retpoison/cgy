@@ -8,12 +8,15 @@ import (
 func InitConfig() {
 	setDefaults()
 	parseFlags()
-	os.OpenFile(config.configPath, os.O_RDONLY|os.O_CREATE, 0666)
+	_, err := os.OpenFile(config.configPath, os.O_RDONLY|os.O_CREATE, 0666)
+	if err != nil {
+		log.Println(err)
+	}
 	readConfig()
 }
 
 func SetLogOutput() {
-	f, err := os.OpenFile(config.LogFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	f, err := os.OpenFile(config.LogFile, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		log.Fatalf("error opening file: %v", err)
 	}

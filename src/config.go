@@ -3,7 +3,6 @@ package cgy
 import (
 	"encoding/json"
 	"flag"
-	"fmt"
 	"log"
 	"os"
 	"reflect"
@@ -60,11 +59,11 @@ func readConfig() {
 func save() {
 	content, err := json.MarshalIndent(config, "", "  ")
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	err = os.WriteFile(config.configPath, content, 0644)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 }
 

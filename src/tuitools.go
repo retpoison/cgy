@@ -1,7 +1,9 @@
 package cgy
 
 import (
+	"errors"
 	"fmt"
+	"log"
 	"os/exec"
 	"strings"
 	"unicode/utf8"
@@ -22,7 +24,14 @@ func refreshVideos() {
 		addToList(pagesMaps["video"],
 			fmt.Sprintf("Getting %s Videos...", chName), "", nil)
 
-		videosSlice = append(videosSlice, getChannelVideos(config.Instance, chID).Videos)
+		v, err := getChannelVideos(config.Instance, chID)
+		if err != nil {
+			log.Println(fmt.Errorf("refreshVideos: %w", err))
+			addToList(pagesMaps["video"], chName+" error:", err.Error(), nil)
+			app.Draw()
+			continue
+		}
+		videosSlice = append(videosSlice, v.Videos)
 		videosCount += len(videosSlice[len(videosSlice)-1])
 
 		addToList(pagesMaps["video"], "Done.", "", nil)
@@ -45,9 +54,15 @@ func refreshChannels() map[string]string {
 	clearList(pagesMaps["channel"])
 
 	var channels = map[string]string{}
-	var channel Channel
 	for _, ch := range config.Channels {
-		channel = getChannelVideos(config.Instance, ch)
+		channel, err := getChannelVideos(config.Instance, ch)
+		if err != nil {
+			log.Println(fmt.Errorf("refreshChannels: %w", err))
+			addToList(pagesMaps["channel"], channel.Name+" error:", err.Error(), nil)
+			app.Draw()
+			continue
+		}
+
 		channels[channel.Name] = ch
 
 		addToList(pagesMaps["channel"], channel.Name, ch, nil)
@@ -62,8 +77,14 @@ func updateInstances() {
 		SetTitle(" Instances ═══ " + config.Instance + " ")
 	clearList(pagesMaps["instance"])
 	addToList(pagesMaps["instance"], "Getting instances...", "", nil)
-	var instances = getInstances()
+	instances, err := getInstances()
 	clearList(pagesMaps["instance"])
+	if err != nil {
+		log.Println(fmt.Errorf("updateInstances: %w", err))
+		addToList(pagesMaps["instance"], "Error:", err.Error(), nil)
+		app.Draw()
+		return
+	}
 
 	var ch = make(chan []string, 2)
 	go requestInstances(ch, instances)
@@ -109,7 +130,14 @@ func qualities(id string) {
 	addToList(pagesMaps["quality"], "Getting available qualities...", "", nil)
 
 	go func() {
-		var video = getVideo(config.Instance, id)
+		video, err := getVideo(config.Instance, id)
+		if err != nil {
+			log.Println(fmt.Errorf("qualities: %w", err))
+			addToList(pagesMaps["quality"], "Error:", err.Error(), nil)
+			app.Draw()
+			return
+		}
+
 		clearList(pagesMaps["quality"])
 		pagesMaps["quality"].(*tview.List).SetTitle(" " + video.Title + " ")
 		pagesMaps["quality"].(*tview.List).SetSelectedFunc(func(index int, mainText string, _ string, _ rune) {
@@ -206,22 +234,14 @@ func center(p tview.Primitive, width, height int) tview.Primitive {
 		AddItem(nil, 0, 1, false)
 }
 
-func getVideoId(status int, str string) (id string, err error) {
-	id = ""
-	err = nil
-	defer func() {
-		if r := recover(); r != nil {
-			err = fmt.Errorf("%v", r)
-		}
-	}()
-
+func getVideoId(status int, str string) (string, error) {
 	if status != -1 {
 		var split = strings.Split(str, " ")
-		id = split[len(split)-1]
-		return
+		return split[len(split)-1], nil
 	}
 
 	// YouTube ID is a string of 11 characters.
+	var id string = ""
 	if len(str) == 11 {
 		id = str
 	} else if strings.Contains(str, "v=") {
@@ -235,10 +255,9 @@ func getVideoId(status int, str string) (id string, err error) {
 	if strings.Contains(id, "&") ||
 		strings.Contains(id, "/") ||
 		len(id) < 11 {
-		id = ""
-		err = fmt.Errorf("Short or wrong video id")
+		return "", errors.New("Short or wrong video id")
 	}
-	return
+	return id, nil
 }
 
 func addToList(list tview.Primitive, mainText, secondaryText string, selected func()) {

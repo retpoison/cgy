@@ -23,6 +23,7 @@ func refreshVideos() {
 	for chName, chID := range channels {
 		addToList(pagesMaps["video"],
 			fmt.Sprintf("Getting %s Videos...", chName), "", nil)
+		app.Draw()
 
 		v, err := getChannelVideos(config.Instance, chID)
 		if err != nil {
@@ -35,7 +36,6 @@ func refreshVideos() {
 		videosCount += len(videosSlice[len(videosSlice)-1])
 
 		addToList(pagesMaps["video"], "Done.", "", nil)
-		app.Draw()
 	}
 
 	go sortVideos(sortedChan, videosSlice, videosCount)
@@ -58,7 +58,7 @@ func refreshChannels() map[string]string {
 		channel, err := getChannelVideos(config.Instance, ch)
 		if err != nil {
 			log.Println(fmt.Errorf("refreshChannels: %w", err))
-			addToList(pagesMaps["channel"], channel.Name+" error:", err.Error(), nil)
+			addToList(pagesMaps["channel"], "error:", err.Error(), nil)
 			app.Draw()
 			continue
 		}
@@ -81,7 +81,7 @@ func updateInstances() {
 	clearList(pagesMaps["instance"])
 	if err != nil {
 		log.Println(fmt.Errorf("updateInstances: %w", err))
-		addToList(pagesMaps["instance"], "Error:", err.Error(), nil)
+		addToList(pagesMaps["instance"], "error: ", err.Error(), nil)
 		app.Draw()
 		return
 	}
@@ -133,7 +133,7 @@ func qualities(id string) {
 		video, err := getVideo(config.Instance, id)
 		if err != nil {
 			log.Println(fmt.Errorf("qualities: %w", err))
-			addToList(pagesMaps["quality"], "Error:", err.Error(), nil)
+			addToList(pagesMaps["quality"], "Error:"+err.Error(), "", nil)
 			app.Draw()
 			return
 		}

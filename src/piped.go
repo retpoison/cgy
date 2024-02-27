@@ -12,8 +12,9 @@ import (
 )
 
 type Channel struct {
-	Name   string  `json:"name"`
-	Videos []Video `json:"relatedStreams"`
+	Name    string  `json:"name"`
+	Videos  []Video `json:"relatedStreams"`
+	Message string  `json:"message"`
 }
 
 type Video struct {
@@ -26,6 +27,7 @@ type Video struct {
 	VidoeStreams     []Streams `json:"videoStreams"`
 	AudioStreams     []Streams `json:"audioStreams"`
 	Duration         int       `json:"duration"`
+	Message          string    `json:"message"`
 	FormatedDuration string
 }
 
@@ -45,6 +47,8 @@ func getChannelVideos(instance, channelId string) (Channel, error) {
 	err = getStruct(str, &channel)
 	if err != nil {
 		return channel, fmt.Errorf("getChannelVideos: %w", err)
+	} else if strings.Contains(channel.Message, "This channel does not exist.") {
+		return channel, fmt.Errorf("getChannelVideos: channel with id:%s does not exist.", channelId)
 	}
 
 	for i, v := range channel.Videos {
@@ -65,6 +69,8 @@ func getVideo(instance, videoId string) (Video, error) {
 	err = getStruct(str, &video)
 	if err != nil {
 		return video, fmt.Errorf("getVideo: %w", err)
+	} else if video.Message == "Video unavailable" {
+		return video, fmt.Errorf("getVideo: video with id:%s is unavailable", videoId)
 	}
 	video.FormatedDuration = getDuration(video.Duration)
 

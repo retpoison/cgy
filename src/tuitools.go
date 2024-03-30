@@ -167,7 +167,10 @@ func qualities(id string) {
 func playStream(args []string) {
 	var command = exec.Command(config.Program, args...)
 	log.Println("running:", command.String())
-	command.Start()
+	err := command.Start()
+	if err != nil {
+		log.Println("error running player:", err)
+	}
 }
 
 func getArgs(title, url, audioUrl, thumbnail string) []string {

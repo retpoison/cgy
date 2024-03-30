@@ -35,14 +35,17 @@ Esc  |-------------Back
 
 Flags
 -----
-Config path
+-c, -config     Config file path.
     cgy -c /home/anon/.config/cgy.json
 
-Piped Instance
+-i,-instance    Piped Instance.
     cgy -i https://pipedapi.kavin.rocks
 
-Log file
+-l, -log        Log file path.
     cgy -l /tmp/cgy.log
+
+-clean          Everything will be stored in ram, not file.
+    cgy --clean
 
 Some info
 ---------

@@ -16,6 +16,7 @@ type Config struct {
 	Program    string   `json:"program"`
 	Options    string   `json:"options"`
 	LogFile    string   `json:"logFile"`
+	Clean      bool
 	configPath string
 }
 
@@ -25,6 +26,7 @@ func setDefaults() {
 	config.Program = "mpv"
 	config.Options = `--keep-open=yes --force-window=yes --audio-file=%audio% --title=%title% --external-file=%thumbnail% --vid=1`
 	config.LogFile = "cgy.log"
+	config.Clean = false
 	config.configPath = "cgy.json"
 }
 
@@ -42,6 +44,8 @@ func parseFlags(s int) {
 			config.LogFile, "path to the log file")
 		flag.StringVar(&config.LogFile, "l",
 			config.LogFile, "path to the log file")
+		flag.BoolVar(&config.Clean, "clean",
+			config.Clean, "no config and log")
 	}
 	flag.Parse()
 }
@@ -58,6 +62,9 @@ func readConfig() {
 }
 
 func save() {
+	if config.Clean {
+		return
+	}
 	content, err := json.MarshalIndent(config, "", "  ")
 	if err != nil {
 		log.Println(err)

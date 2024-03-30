@@ -9,16 +9,18 @@ import (
 func InitConfig() {
 	setDefaults()
 	parseFlags(0)
-	_, err := os.OpenFile(config.configPath, os.O_RDONLY|os.O_CREATE, 0666)
-	if err != nil {
-		log.Println(err)
+	if !(config.Clean) {
+		_, err := os.OpenFile(config.configPath, os.O_RDONLY|os.O_CREATE, 0666)
+		if err != nil {
+			log.Println(err)
+		}
+		readConfig()
 	}
-	readConfig()
 	parseFlags(1)
 }
 
 func SetLogOutput() {
-	if config.LogFile == "None" {
+	if config.LogFile == "None" || config.Clean {
 		log.SetOutput(io.Discard)
 		return
 	}

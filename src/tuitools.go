@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os/exec"
+	"sort"
 	"strings"
 	"unicode/utf8"
 
@@ -16,9 +17,7 @@ func refreshVideos() {
 	addToList(pagesMaps["video"], "Refreshing...", "", nil)
 	channels := refreshChannels()
 
-	var videosSlice [][]Video
-	var videosCount int = 0
-	var sortedChan = make(chan Video, 3)
+	var videos []Video
 
 	for chName, chID := range channels {
 		addToList(pagesMaps["video"],
@@ -32,15 +31,17 @@ func refreshVideos() {
 			app.Draw()
 			continue
 		}
-		videosSlice = append(videosSlice, v.Videos)
-		videosCount += len(videosSlice[len(videosSlice)-1])
+		videos = append(videos, v.Videos...)
 
 		addToList(pagesMaps["video"], "Done.", "", nil)
 	}
 
-	go sortVideos(sortedChan, videosSlice, videosCount)
 	clearList(pagesMaps["video"])
-	for v := range sortedChan {
+	sort.Slice(videos, func(i, j int) bool {
+		return videos[i].Uploaded > videos[j].Uploaded
+	})
+
+	for _, v := range videos {
 		addToList(pagesMaps["video"], v.Title,
 			fmt.Sprintf("%s - %9s - %s - %s",
 				pding(v.Uploader, 30), v.FormatedDuration, v.UploadDate, v.Id),
@@ -91,35 +92,6 @@ func updateInstances() {
 	for v := range ch {
 		addToList(pagesMaps["instance"], v[0], v[1], nil)
 		app.Draw()
-	}
-}
-
-func sortVideos(schan chan<- Video, videos [][]Video, count int) {
-	defer close(schan)
-	var index = make([]int, len(videos))
-	for i := range index {
-		index[i] = 0
-	}
-
-	for i := 0; i < count; i++ {
-		max := 0
-		for j := 0; j < len(videos); j++ {
-			if index[j] >= len(videos[j]) {
-				continue
-			}
-			if videos[j][index[j]].Uploaded > max {
-				max = videos[j][index[j]].Uploaded
-			}
-		}
-		for j := 0; j < len(videos); j++ {
-			if index[j] >= len(videos[j]) {
-				continue
-			}
-			if videos[j][index[j]].Uploaded == max {
-				schan <- videos[j][index[j]]
-				index[j]++
-			}
-		}
 	}
 }
 

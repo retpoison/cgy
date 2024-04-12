@@ -12,28 +12,28 @@ import (
 	"github.com/rivo/tview"
 )
 
-func refreshVideos() {
+func refresh() {
+	clearList(pagesMaps["channel"])
 	clearList(pagesMaps["video"])
 	addToList(pagesMaps["video"], "Refreshing...", "", nil)
-	channels := refreshChannels()
 
 	var videos []Video
-
-	for chName, chID := range channels {
+	for _, ch := range config.Channels {
 		addToList(pagesMaps["video"],
-			fmt.Sprintf("Getting %s Videos...", chName), "", nil)
+			fmt.Sprintf("Getting %s Videos...", ch), "", nil)
 		app.Draw()
 
-		v, err := getChannelVideos(config.Instance, chID)
+		channel, err := getChannelVideos(config.Instance, ch)
 		if err != nil {
-			log.Println(fmt.Errorf("refreshVideos: %w", err))
-			addToList(pagesMaps["video"], chName+" error:", err.Error(), nil)
-			app.Draw()
+			log.Println(fmt.Errorf("refresh: %w", err))
+			addToList(pagesMaps["channel"], "error:", err.Error(), nil)
+			addToList(pagesMaps["video"], ch+" error:", err.Error(), nil)
 			continue
 		}
-		videos = append(videos, v.Videos...)
 
+		videos = append(videos, channel.Videos...)
 		addToList(pagesMaps["video"], "Done.", "", nil)
+		addToList(pagesMaps["channel"], channel.Name, ch, nil)
 	}
 
 	clearList(pagesMaps["video"])
@@ -49,28 +49,6 @@ func refreshVideos() {
 	}
 
 	app.Draw()
-}
-
-func refreshChannels() map[string]string {
-	clearList(pagesMaps["channel"])
-
-	var channels = map[string]string{}
-	for _, ch := range config.Channels {
-		channel, err := getChannelVideos(config.Instance, ch)
-		if err != nil {
-			log.Println(fmt.Errorf("refreshChannels: %w", err))
-			addToList(pagesMaps["channel"], "error:", err.Error(), nil)
-			app.Draw()
-			continue
-		}
-
-		channels[channel.Name] = ch
-
-		addToList(pagesMaps["channel"], channel.Name, ch, nil)
-	}
-	app.Draw()
-
-	return channels
 }
 
 func updateInstances() {

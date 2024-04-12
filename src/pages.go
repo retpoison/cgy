@@ -96,7 +96,7 @@ func getChannelInput() tview.Primitive {
 			config.addChannel(channelInput.GetText())
 		}
 		channelInput.SetText("")
-		go refreshVideos()
+		go refresh()
 		pages.SwitchToPage("video")
 	})
 	return channelInput
@@ -132,7 +132,7 @@ func getDeleteChannel(sChannel, sChannelID *string) tview.Primitive {
 	deleteChannel.SetDoneFunc(func(_ int, buttonLabel string) {
 		if buttonLabel == "Yes" {
 			config.removeChannel(*sChannelID)
-			go refreshVideos()
+			go refresh()
 			pages.SwitchToPage("channel")
 		} else if buttonLabel == "No" {
 			pages.SwitchToPage("channel")

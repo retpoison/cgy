@@ -36,7 +36,7 @@ func InitTui() {
 			pages.SwitchToPage("play")
 			return nil
 		case 'R', 'r':
-			go refreshVideos()
+			go refresh()
 		case 'I', 'i':
 			pages.SwitchToPage("instance")
 			go updateInstances()

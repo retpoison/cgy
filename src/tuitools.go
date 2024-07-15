@@ -219,5 +219,6 @@ func addToList(list tview.Primitive, mainText, secondaryText string, selected fu
 }
 
 func clearList(list tview.Primitive) {
+	list.(*tview.List).SetCurrentItem(0)
 	list.(*tview.List).Clear()
 }

@@ -179,7 +179,7 @@ R, r |----------Refresh
 I, i |--------Instances
 H, h |-------------help
 Q, q |-------------Quit
-Esc  |-------------Back
+Esc  |-----------Videos
 
 Enter, Space:
 Play in video list

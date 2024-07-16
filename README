@@ -31,14 +31,14 @@ R, r |----------Refresh
 I, i |--------Instances
 H, h |-------------help
 Q, q |-------------Quit
-Esc  |-------------Back
+Esc  |-----------Videos
 
 Flags
 -----
 -c, -config     Config file path.
     cgy -c /home/anon/.config/cgy.json
 
--i,-instance    Piped Instance.
+-i, -instance   Piped Instance.
     cgy -i https://pipedapi.kavin.rocks
 
 -l, -log        Log file path.

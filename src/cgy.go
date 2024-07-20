@@ -9,7 +9,7 @@ import (
 func InitConfig() {
 	setDefaults()
 	parseFlags(0)
-	if !(config.Clean) {
+	if !(config.clean) {
 		_, err := os.OpenFile(config.configPath, os.O_RDONLY|os.O_CREATE, 0666)
 		if err != nil {
 			log.Println(err)
@@ -20,7 +20,7 @@ func InitConfig() {
 }
 
 func SetLogOutput() {
-	if config.LogFile == "None" || config.Clean {
+	if config.LogFile == "None" || config.clean {
 		log.SetOutput(io.Discard)
 		return
 	}

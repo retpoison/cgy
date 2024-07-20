@@ -16,7 +16,7 @@ type Config struct {
 	Program    string   `json:"program"`
 	Options    []string `json:"options"`
 	LogFile    string   `json:"logFile"`
-	Clean      bool
+	clean      bool
 	configPath string
 }
 
@@ -27,7 +27,7 @@ func setDefaults() {
 	config.Options = []string{"--keep-open=yes", "--force-window=yes",
 		"--audio-file=%audio%", "--title=%title%",
 		"--external-file=%thumbnail%", "--vid=1"}
-	config.Clean = false
+	config.clean = false
 
 	var home string = os.Getenv("HOME")
 	configFolder := home + "/.config"
@@ -58,8 +58,8 @@ func parseFlags(s int) {
 			config.LogFile, "path to the log file")
 		flag.StringVar(&config.LogFile, "l",
 			config.LogFile, "path to the log file")
-		flag.BoolVar(&config.Clean, "clean",
-			config.Clean, "no config and log")
+		flag.BoolVar(&config.clean, "clean",
+			config.clean, "no config and log")
 	}
 	flag.Parse()
 }
@@ -80,7 +80,7 @@ func readConfig() error {
 }
 
 func save() error {
-	if config.Clean {
+	if config.clean {
 		return nil
 	}
 	content, err := json.MarshalIndent(config, "", "  ")

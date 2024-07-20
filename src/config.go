@@ -25,9 +25,21 @@ func setDefaults() {
 	config.Instance = "https://pipedapi.kavin.rocks"
 	config.Program = "mpv"
 	config.Options = `--keep-open=yes --force-window=yes --audio-file=%audio% --title=%title% --external-file=%thumbnail% --vid=1`
-	config.LogFile = "cgy.log"
 	config.Clean = false
-	config.configPath = "cgy.json"
+
+	var home string = os.Getenv("HOME")
+	configFolder := home + "/.config"
+	logFolder := home + "/.cache"
+	if _, err := os.Stat(configFolder); !os.IsNotExist(err) {
+		config.configPath = configFolder + "/cgy.json"
+	} else {
+		config.configPath = "cgy.json"
+	}
+	if _, err := os.Stat(logFolder); !os.IsNotExist(err) {
+		config.LogFile = logFolder + "/cgy.log"
+	} else {
+		config.LogFile = "cgy.log"
+	}
 }
 
 func parseFlags(s int) {

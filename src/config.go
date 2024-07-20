@@ -3,7 +3,7 @@ package cgy
 import (
 	"encoding/json"
 	"flag"
-	"log"
+	"fmt"
 	"os"
 	"reflect"
 )
@@ -64,53 +64,39 @@ func parseFlags(s int) {
 	flag.Parse()
 }
 
-func readConfig() {
+func readConfig() error {
 	content, err := os.ReadFile(config.configPath)
 	if err != nil {
-		log.Println(err)
+		return fmt.Errorf("reading config file: %w", err)
 	}
 	if string(content) == "" {
 		content = []byte("{}")
 	}
 	err = json.Unmarshal(content, &config)
 	if err != nil {
-		log.Println(err)
+		return fmt.Errorf("Unmarshal config: %w", err)
 	}
+	return nil
 }
 
-func save() {
+func save() error {
 	if config.Clean {
-		return
+		return nil
 	}
 	content, err := json.MarshalIndent(config, "", "  ")
 	if err != nil {
-		log.Println(err)
+		return fmt.Errorf("marshal config: %w", err)
 	}
 	err = os.WriteFile(config.configPath, content, 0644)
 	if err != nil {
-		log.Println(err)
+		return fmt.Errorf("write config file: %w", err)
 	}
+	return nil
 }
 
-func (c *Config) set(key string, value interface{}) {
+func (c *Config) set(key string, value interface{}) error {
 	rv := reflect.ValueOf(c).Elem()
 	fv := rv.FieldByName(key)
 	fv.Set(reflect.ValueOf(value))
-	save()
-}
-
-func (c *Config) addChannel(channel string) {
-	c.Channels = append(c.Channels, channel)
-	save()
-}
-
-func (c *Config) removeChannel(channel string) {
-	var chs []string
-	for _, v := range c.Channels {
-		if v != channel {
-			chs = append(chs, v)
-		}
-	}
-	c.Channels = chs
-	save()
+	return save()
 }

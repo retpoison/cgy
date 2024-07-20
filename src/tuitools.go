@@ -225,3 +225,25 @@ func clearList(list tview.Primitive) {
 	list.(*tview.List).SetCurrentItem(0)
 	list.(*tview.List).Clear()
 }
+
+func addChannel(channel string) {
+	var chs []string
+	chs = append(config.Channels, channel)
+	err := config.set("Channels", chs)
+	if err != nil {
+		log.Println(err)
+	}
+}
+
+func removeChannel(channel string) {
+	var chs []string
+	for _, v := range config.Channels {
+		if v != channel {
+			chs = append(chs, v)
+		}
+	}
+	err := config.set("Channels", chs)
+	if err != nil {
+		log.Println(err)
+	}
+}

@@ -124,15 +124,18 @@ func playStream(args []string) {
 }
 
 func getArgs(title, url, audioUrl, thumbnail string) []string {
-	var options string
+	var args = []string{}
 	if audioUrl == "" {
-		options = strings.Replace(config.Options,
-			"--audio-file=%audio%", "", 1)
+		for _, v := range config.Options {
+			if v == "--audio-file=%audio%" {
+				continue
+			}
+			args = append(args, v)
+		}
 	} else {
-		options = config.Options
+		args = config.Options
 	}
 
-	var args = strings.Split(options, " ")
 	for i, v := range args {
 		if strings.Contains(v, "%title%") {
 			args[i] = strings.Replace(v, "%title%", title, 1)

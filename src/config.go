@@ -14,7 +14,7 @@ type Config struct {
 	Channels   []string `json:"channels"`
 	Instance   string   `json:"instance"`
 	Program    string   `json:"program"`
-	Options    string   `json:"options"`
+	Options    []string `json:"options"`
 	LogFile    string   `json:"logFile"`
 	Clean      bool
 	configPath string
@@ -24,7 +24,9 @@ func setDefaults() {
 	config.Channels = []string{}
 	config.Instance = "https://pipedapi.kavin.rocks"
 	config.Program = "mpv"
-	config.Options = `--keep-open=yes --force-window=yes --audio-file=%audio% --title=%title% --external-file=%thumbnail% --vid=1`
+	config.Options = []string{"--keep-open=yes", "--force-window=yes",
+		"--audio-file=%audio%", "--title=%title%",
+		"--external-file=%thumbnail%", "--vid=1"}
 	config.Clean = false
 
 	var home string = os.Getenv("HOME")

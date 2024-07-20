@@ -67,6 +67,9 @@ func readConfig() {
 	if err != nil {
 		log.Println(err)
 	}
+	if string(content) == "" {
+		content = []byte("{}")
+	}
 	err = json.Unmarshal(content, &config)
 	if err != nil {
 		log.Println(err)

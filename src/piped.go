@@ -38,6 +38,10 @@ type Streams struct {
 	VideoOnly bool   `json:"videoOnly"`
 }
 
+type Instance struct {
+	Url string `json:"api_url"`
+}
+
 func getChannelVideos(instance, channelId string) (Channel, error) {
 	var channel = Channel{}
 	var str, err = request(instance + "/channel/" + channelId)
@@ -83,7 +87,7 @@ func getInstances() ([]string, error) {
 	var url string = "https://raw.githubusercontent.com/TeamPiped/documentation/main/content/docs/public-instances/index.md"
 	var content, err = request(url)
 	if err != nil {
-		return instances, fmt.Errorf("getInstances: %w", err)
+		goto second_way
 	}
 
 	for _, v := range strings.Split(string(content), "\n") {
@@ -97,6 +101,23 @@ func getInstances() ([]string, error) {
 				instances = append(instances, strings.TrimSpace(split[1]))
 			}
 		}
+	}
+	return instances, nil
+
+second_way:
+	var instances_struct = []Instance{}
+	url = "https://piped-instances.kavin.rocks/"
+	content, err = request(url)
+	if err != nil {
+		return instances, fmt.Errorf("getInstances: %w", err)
+	}
+
+	err = getStruct(content, &instances_struct)
+	if err != nil {
+		return instances, fmt.Errorf("getInstances: %w", err)
+	}
+	for _, v := range instances_struct {
+		instances = append(instances, v.Url)
 	}
 
 	return instances, nil

@@ -78,22 +78,24 @@ func getVideo(instance, videoId string) (Video, error) {
 }
 
 func getInstances() ([]string, error) {
+	var in bool = false
 	var instances = []string{}
-	var url string = "https://raw.githubusercontent.com/wiki/TeamPiped/Piped-Frontend/Instances.md"
+	var url string = "https://raw.githubusercontent.com/TeamPiped/documentation/main/content/docs/public-instances/index.md"
 	var content, err = request(url)
 	if err != nil {
 		return instances, fmt.Errorf("getInstances: %w", err)
 	}
 
-	var skipped int = 0
 	for _, v := range strings.Split(string(content), "\n") {
 		var split = strings.Split(v, "|")
 		if len(split) == 5 {
-			if skipped < 2 {
-				skipped++
+			if strings.TrimSpace(split[0]) == "---" {
+				in = true
 				continue
 			}
-			instances = append(instances, strings.TrimSpace(split[1]))
+			if in {
+				instances = append(instances, strings.TrimSpace(split[1]))
+			}
 		}
 	}
 

@@ -147,7 +147,7 @@ func requestInstances(ch chan []string, instance []string) {
 		} else {
 			s = []string{
 				in,
-				">5s",
+				fmt.Sprintf(">5s code: %s", err.Error()),
 			}
 			last = append(last, s)
 		}

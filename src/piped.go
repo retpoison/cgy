@@ -125,16 +125,33 @@ second_way:
 
 func requestInstances(ch chan []string, instance []string) {
 	var wg sync.WaitGroup
+	var mx sync.RWMutex
+	var transport *http.Transport
+	var proxy *url.URL
+
+	if config.Proxy == "" {
+		transport = http.DefaultTransport.(*http.Transport)
+	} else {
+		proxy, _ = url.Parse(config.Proxy)
+		transport = &http.Transport{Proxy: http.ProxyURL(proxy)}
+	}
+
 	client := http.Client{
-		Timeout: 5 * time.Second,
+		Timeout:   5 * time.Second,
+		Transport: transport,
 	}
 	var last = [][]string{}
 
 	var req = func(in string) {
 		defer wg.Done()
 		var s []string
+		request, _ := http.NewRequest("GET",
+			in+"/streams/rRPQs_kM_nw", nil)
+		request.Header.Set("User-Agent",
+			"Mozilla/5.0 (Windows NT 10.0; rv:112.0) Gecko/20100101 Firefox/112.0  uacq")
+
 		start := time.Now()
-		result, err := client.Get(in + "/streams/rRPQs_kM_nw")
+		result, err := client.Do(request)
 		if err == nil {
 			if result.StatusCode == 200 {
 				s = []string{
@@ -149,7 +166,9 @@ func requestInstances(ch chan []string, instance []string) {
 				in,
 				fmt.Sprintf(">5s code: %s", err.Error()),
 			}
+			mx.Lock()
 			last = append(last, s)
+			mx.Unlock()
 		}
 	}
 
@@ -170,8 +189,30 @@ func getDuration(duration int) string {
 		duration/60/60, duration/60%60, duration%60)
 }
 
-func request(url string) (string, error) {
-	var resp, err = http.Get(url)
+func request(req_url string) (string, error) {
+	var transport *http.Transport
+	var proxy *url.URL
+	var err error
+
+	if config.Proxy == "" {
+		transport = http.DefaultTransport.(*http.Transport)
+	} else {
+		proxy, err = url.Parse(config.Proxy)
+		if err != nil {
+			return "", fmt.Errorf("request: %w", err)
+		}
+		transport = &http.Transport{Proxy: http.ProxyURL(proxy)}
+	}
+
+	var client = http.Client{Transport: transport}
+	req, err := http.NewRequest("GET", req_url, nil)
+	if err != nil {
+		return "", fmt.Errorf("request: %w", err)
+	}
+	req.Header.Set("User-Agent",
+		"Mozilla/5.0 (Windows NT 10.0; rv:112.0) Gecko/20100101 Firefox/112.0  uacq")
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("request: %w", err)
 	}

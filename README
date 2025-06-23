@@ -44,6 +44,9 @@ Flags
 -l, -log        Log file path.
     cgy -l /tmp/cgy.log
 
+-p, -proxy      proxy.
+    cgy -p http://127.0.0.1:9050
+
 -clean          Everything will be stored in ram, not file.
     cgy --clean
 

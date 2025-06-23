@@ -16,6 +16,7 @@ type Config struct {
 	Program    string   `json:"program"`
 	Options    []string `json:"options"`
 	LogFile    string   `json:"logFile"`
+	Proxy      string   `json:"proxy"`
 	clean      bool
 	configPath string
 }
@@ -24,7 +25,8 @@ func setDefaults() {
 	config.Channels = []string{}
 	config.Instance = "https://pipedapi.kavin.rocks"
 	config.Program = "mpv"
-	config.Options = []string{"--keep-open=yes", "--force-window=yes",
+	config.Options = []string{"--keep-open=yes",
+		"--force-window=yes",
 		"--audio-file=%audio%", "--title=%title%",
 		"--external-file=%thumbnail%", "--vid=1"}
 	config.clean = false
@@ -58,6 +60,10 @@ func parseFlags(s int) {
 			config.LogFile, "path to the log file")
 		flag.StringVar(&config.LogFile, "l",
 			config.LogFile, "path to the log file")
+		flag.StringVar(&config.Proxy, "proxy",
+			config.Proxy, "proxy url")
+		flag.StringVar(&config.Proxy, "p",
+			config.Proxy, "proxy url")
 		flag.BoolVar(&config.clean, "clean",
 			config.clean, "no config and log")
 	}
